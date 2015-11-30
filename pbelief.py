@@ -27,24 +27,24 @@ def common_p_belief(model, player, state, verbose = False):
     0.49999999999999994
     """
     
-    state_set = set(model.statespace)
-    last_state_set = state_set
+    evident_event = set(model.statespace)
+    last_evident_event = evident_event
     
-    while conditional(model, player, state_set, state) > 0:
+    while conditional(model, player, evident_event, state) > 0:
         
-        tmp_min_belief = get_min_belief(model, state_set)
+        tmp_min_belief = evidence_level(model, evident_event)
         
-        last_state_set = state_set
-        state_set = super_p_evident(model, state_set, tmp_min_belief)
+        last_evident_event = evident_event
+        evident_event = super_p_evident(model, evident_event, tmp_min_belief)
 
-    min_belief = get_min_belief(model, last_state_set)
+    min_belief = evidence_level(model, last_evident_event)
 
     if verbose:
-        print last_state_set    
+        print last_evident_event    
         
     return min_belief
 
-def super_p_evident(model, state_set, p):
+def super_p_evident(model, evident_event, p):
     """
     >>> from simple_model import *
     >>> m = SimpleModel(0.1, 0.95)
@@ -68,48 +68,62 @@ def super_p_evident(model, state_set, p):
     set([])
     """
     
-    event = get_satisfying_states(model)
+    dog_day_event = get_satisfying_states(model)
     
     changed = True
     while changed:
         changed = False
-        for i in range(model.n_players):
-            for x in state_set:
-                if conditional(model, i, state_set, x) <= p or conditional(model, i, event, x) <= p:
-                    state_set = state_set.difference(set([x]))
-                    changed = True
+        for x in evident_event:
+            if get_min_belief(model, evident_event, [x]) <= p:
+                evident_event = evident_event.difference(set([x]))
+                changed = True
     
-    return state_set
+    return evident_event
 
-def get_min_belief(model, state_set):
+def evidence_level(model, evident_event):
     """
     >>> from simple_model import *
     >>> m = SimpleModel(0.1, 0.95)
-    >>> get_min_belief(m, set(m.statespace))
+    >>> evidence_level(m, set(m.statespace))
     0.0
-    >>> get_min_belief(m, set([(1, 1, 1)]))
+    >>> evidence_level(m, set([(1, 1, 1)]))
     0.95
-    >>> get_min_belief(m, set([(1, 1, 0)]))
+    >>> evidence_level(m, set([(1, 1, 0)]))
     0.05000000000000007
     >>> from thomas_model import *
     >>> m = ThomasModel(0.1, 0.25)
-    >>> get_min_belief(m, set([(1, 1, 1, 0, 0), (1, 1, 1, 0, 1), (1, 1, 1, 1, 1), (1, 1, 1, 1, 0)]))
+    >>> evidence_level(m, set([(1, 1, 1, 0, 0), (1, 1, 1, 0, 1), (1, 1, 1, 1, 1), (1, 1, 1, 1, 0)]))
     0.25000000000000017
-    >>> get_min_belief(m, set([(1, 1, 1, 1, 1), (1, 1, 1, 1, 0)]))
+    >>> evidence_level(m, set([(1, 1, 1, 1, 1), (1, 1, 1, 1, 0)]))
     0.49999999999999994
-    >>> get_min_belief(m, set([(1, 1, 1, 1, 1)]))
+    >>> evidence_level(m, set([(1, 1, 1, 1, 1)]))
     1.0
     """
-    
-    event = get_satisfying_states(model)
+    return get_min_belief(model, evident_event, evident_event)
+
+def get_min_belief(model, evident_event, states):
+    """
+    >>> from asym_model import *
+    >>> m = AsymmetricModel(0.1, 0.95)
+    >>> get_min_belief(m, set([(1, 1, 1),(1, 1, 0)]), [(1, 1, 0)])
+    0.09500000000000006
+    >>> get_min_belief(m, set([(1, 1, 1),(1, 1, 0)]), [(1, 1, 1)])
+    1.0
+    >>> from simple_model import *
+    >>> m = SimpleModel(0.1, 0.95)
+    >>> get_min_belief(m, set([(1, 1, 1),(1, 1, 0)]), [(1, 1, 1)])
+    0.95
+    """
+
+    dog_day_event = get_satisfying_states(model)
     
     p = 1.0
 
     for i in range(model.n_players):
         
-        for x in state_set:
+        for x in states:
             
-            this_p = min(conditional(model, i, state_set, x), conditional(model, i, event, x))
+            this_p = min(conditional(model, i, evident_event, x), conditional(model, i, dog_day_event, x))
             
             if this_p < p:
                 p = this_p
