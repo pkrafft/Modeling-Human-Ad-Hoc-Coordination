@@ -4,13 +4,18 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
+import matplotlib as mpl
+
 from config import *
 from plot_tools import *
+
 
 ### qualitative predictions ###
 
 sns.set(style = 'whitegrid')
-sns.set_context('paper', font_scale = 1.8)
+sns.set_context('paper', font_scale = 2.3)
+mpl.rc('font',family='Times New Roman')
+
 
 df = pd.read_csv(out_dir + 'predictions.csv')
 df = df[df['Model'] == 'Behavioral Data']
@@ -32,7 +37,8 @@ plt.tight_layout()
 
 g; plt.savefig(plot_dir + 'data.pdf')
 
-sns.set_context('paper', font_scale = 2)
+sns.set_context('paper', font_scale = 2.5)
+mpl.rc('font',family='Times New Roman')
 
 df = pd.read_csv(out_dir + 'predictions.csv')
 df = df[df['Model'] != 'Behavioral Data']
@@ -59,7 +65,8 @@ g; plt.savefig(plot_dir + 'predictions.pdf')
 ### quantitative predictions ###
 
 sns.set(style = 'whitegrid')
-sns.set_context('paper', font_scale = 2.5)
+sns.set_context('paper', font_scale = 3)
+mpl.rc('font',family='Times New Roman')
 
 df = pd.read_csv(out_dir + 'errors.csv')
 
@@ -82,23 +89,25 @@ g; plt.savefig(plot_dir + 'errors.pdf')
 
 ### collaborating with humans ###
 
-fig, ax = plt.subplots()
+sns.set(style = 'white', font = 'Times New Roman')
+sns.set_context('paper', font_scale = 3)
 
-sns.set(style = 'white')
-sns.set_context('paper', font_scale = 2.5)
+fig, ax = plt.subplots()
 
 ax.set_color_cycle(sns.color_palette("colorblind"))
 
 df = pd.read_csv(out_dir + 'thomas-simulations.csv')
 
-for i,m in enumerate(['Pair Heuristic', 'Private Heuristic', 'Cognitive Strategy']):
+plt.axhline(y=0, xmin=0, xmax=1, color = '#A9A9A9')
+
+for i,m in enumerate(['Private Heuristic', 'Pair Heuristic', 'Cognitive Strategy']):
     sub = df['Model'] == m
     ax.plot(df[sub]['Risk'], df[sub]['Relative Value'], label = m, lw = 5)
-
+    
 plt.xlabel('Risk')
 plt.ylabel('Strategy Marginal Value')
-legend = ax.legend(loc='lower left')
+legend = ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 plt.tight_layout()
 
-plt.savefig(plot_dir + 'thomas-simulations.pdf')
+plt.savefig(plot_dir + 'thomas-simulations.pdf', bbox_inches='tight')
