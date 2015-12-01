@@ -55,9 +55,9 @@ models = [
     lambda par,model,player,state: common_p_belief(model,player,state),
     lambda par,model,player,state: int(common_p_belief(model,player,state) > threshold)]
 
-names = ['Iterated Matching', 'Iterated Maximizing', 'Matched p-Belief', 'Rational p-Belief']
+names = ['Iterated Matching', 'Iterated Maximization', 'Matched p-Belief', 'Rational p-Belief']
 
-k_values = [0, 1, 2, 3, 4] # parameter sweep for iterated (level-k) models
+k_values = [0, 1, 2, 3, 4, 5] # parameter sweep for iterated (level-k) models
 pars = [k_values, k_values, [None], [None]]
 
 threshold = optimal_threshold(payoffs) # optimal threshold for rational p-belief
