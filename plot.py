@@ -100,9 +100,10 @@ df = pd.read_csv(out_dir + 'thomas-simulations.csv')
 
 plt.axhline(y=0, xmin=0, xmax=1, color = '#A9A9A9')
 
+styles = ['-.', ':', '--']
 for i,m in enumerate(['Private Heuristic', 'Pair Heuristic', 'Cognitive Strategy']):
     sub = df['Model'] == m
-    ax.plot(df[sub]['Risk'], df[sub]['Relative Value'], label = m, lw = 5)
+    ax.plot(df[sub]['Risk'], df[sub]['Relative Value'], label = m, lw = 8, linestyle = styles[i])
     
 plt.xlabel('Risk')
 plt.ylabel('Strategy Marginal Value')
